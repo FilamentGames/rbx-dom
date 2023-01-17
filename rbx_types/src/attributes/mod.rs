@@ -61,6 +61,13 @@ impl Attributes {
         self.data.insert(key, value)
     }
 
+    /// Inserts an attribute with the given key and value.
+    /// Will overwrite the attribute that used to be there if one existed.
+    pub fn with<K: Into<String>, V: Into<Variant>>(mut self, key: K, value: V) -> Self {
+        self.data.insert(key.into(), value.into());
+        self
+    }
+
     /// Removes an attribute with the given key.
     /// Will return the value that was there if one existed.
     pub fn remove<K: Hash + Eq + Borrow<str>>(&mut self, key: K) -> Option<Variant> {
@@ -144,6 +151,32 @@ mod tests {
             .expect("couldn't deserialize crate produced binary");
 
         assert_eq!(attributes, new_attributes);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_encode_json() {
+        use serde_json::{json, Value};
+
+        fn assert_json(value: Attributes, expected: Value) {
+            let encoded = serde_json::to_string(&value).unwrap();
+            let decoded: Value = serde_json::from_str(&encoded).unwrap();
+
+            assert_eq!(decoded, expected);
+        }
+
+        let empty = Attributes::new();
+        assert_json(empty, json!({}));
+
+        let number = Attributes::new().with("hello", 5.0f64);
+        assert_json(
+            number,
+            json!({
+                "hello": {
+                    "Float64": 5.0
+                }
+            }),
+        );
     }
 
     #[test]

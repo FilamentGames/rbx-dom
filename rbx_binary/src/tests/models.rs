@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use heck::KebabCase;
+use heck::ToKebabCase;
 
 use super::util::run_model_base_suite;
 
@@ -25,6 +25,7 @@ macro_rules! binary_tests {
 }
 
 binary_tests! {
+    attributes,
     axes,
     bloomeffect,
     cframe_case_mixture,
@@ -57,4 +58,5 @@ binary_tests! {
     two_ray_values,
     two_terrainregions,
     weldconstraint,
+    package_link,
 }
